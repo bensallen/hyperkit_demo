@@ -20,8 +20,10 @@ fi
 
 MEM="-m 2G"
 SMP="-c 2"
-# eth0
-NET="-s 2:0,virtio-net" # -s 2:1,virtio-net,vmnet1"
+# eth0, using vmnet
+#NET="-s 2:0,virtio-net" # -s 2:1,virtio-net,vmnet1"
+# eth0, use a tap device instead of vmnet. Requires: brew cask install tuntap, and creating bridge interface and ifconfig bridge0 addm tap0
+NET="-s 2:0,virtio-tap,tap0"
 #IMG_CD="-s 3,ahci-cd,/somepath/somefile.iso"
 # /dev/vda
 IMG_HDD="-s 4,virtio-blk,file:///Users/ballen/Desktop/Labs/hyperkit_demo/hdd.img,format=qcow"
@@ -63,7 +65,7 @@ $HYPERKIT $ACPI $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD $RND $UUID -f 
 # - Find host IP address that will be used for vmnet
 #   $ defaults read /Library/Preferences/SystemConfiguration/com.apple.vmnet Shared_Net_Address
 #  192.168.64.1
-# - Seems unlikely that there is actually more than one vmnet based on the above com.apple.vmnet plist. Even though the man page for hyperkit shows a vmnetN syntax. Also seems unlikely that backing virtio-net with a tap interface will work on macOS. 
+# - Seems unlikely that there is actually more than one vmnet based on the above com.apple.vmnet plist. Even though the man page for hyperkit shows a vmnetN syntax.
 # - SIGTERM to the hyperkit process is how to gracefully shutdown a VM.
 # - Apparent method to automatically find VMs IP, is based on the MAC address (generated via UUID) and then find entry in dhcpd_leases, eg. how docker-machine hyperkit driver is doing it.
 # - In general hyperkit's help output and man page doesn't seem realiable. The man page seems to have many byhve/xyhve left overs
